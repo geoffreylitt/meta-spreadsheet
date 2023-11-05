@@ -6,10 +6,9 @@ export const testEmbark = () => {
   const graph = makeGraph({ embark });
 
   /**
-   test case:
    - weather: { min: 50, max: 75 }
      - unnamed intermediate node with text value
-       - {weather.max - weather.min}
+       - {weather.max - weather.min} = 25
   **/
 
   const cell1: Cell = makeCell({
@@ -37,4 +36,26 @@ export const testEmbark = () => {
 
   evalGraph(graph);
   assertEq(cell3.value, 25);
+
+  /**
+   Look one level down before looking up
+
+   - weather: { min: 50, max: 75 }
+     - unnamed intermediate node with text value
+       - {weather.max - weather.min} = 1
+          - weather: { min: 1, max: 2 }
+  **/
+
+  const cell4: Cell = makeCell({
+    graph,
+    name: "weather",
+    value: { min: 1, max: 2 },
+    relationships: {
+      [embark.relationships.parent]: cell3,
+    },
+  });
+  cell3.relationships[embark.relationships.child] = cell4;
+
+  evalGraph(graph);
+  assertEq(cell3.value, 1);
 };

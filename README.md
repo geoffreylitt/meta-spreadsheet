@@ -48,3 +48,4 @@ Currently this demo shows two coordinate systems:
 - is L2U1 equivalent to U1L2? how does that work with a sparse link-based coordinate system where we don't necessarily materialize a cell at every position?
   - we could use a pathfinding algorithm, but that feels kinda needlessly heavy...
 - how much is it useful to mix and match coordinate systems within the same formula? eg: traverse a parent link, and then a 2D grid link. seems funky but unclear if it's valuable.
+- can a single relationship point to multiple cells? This would be helpful for, eg, the `children` relationship type for Embark. But it's annoying to pollute all relationships with this kind of multiplicity.

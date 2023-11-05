@@ -5,6 +5,10 @@ const embarkChild = Symbol("child");
 export const embark = {
   relationships: {
     parent: embarkParent,
+
+    // NOTE: we only support one child currently;
+    // i haven't figured out the best way to model array of ordered children.
+    // is there a single "children" link type which points to a list of cells..?
     child: embarkChild,
   },
   lookups: {
@@ -14,6 +18,11 @@ export const embark = {
       let current = cell;
       const visited = [cell];
       while (current !== undefined) {
+        const child = current.relationships[embarkChild];
+        if (child && child.name === name) {
+          return child.value;
+        }
+
         const parent = current.relationships[embarkParent];
         if (visited.includes(parent)) {
           throw new Error("cycle detected!");
