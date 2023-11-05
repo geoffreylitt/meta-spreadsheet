@@ -4,7 +4,9 @@ A tiny spreadsheet engine with pluggable coordinate systems.
 
 Credit: heavily inspired by ideas from Alex Warth, Avi Bryant, Paul Sonnentag and others.
 
-## example
+## examples
+
+Excel:
 
 ```ts
 const graph = makeGraph({ excel });
@@ -30,6 +32,44 @@ const graph = makeGraph({ excel });
 
   evalGraph(graph);
   assertEq(cell2.value, 2);
+```
+
+Embark:
+
+```ts
+const graph = makeGraph({ embark });
+
+  /**
+   - weather: { min: 50, max: 75 }
+     - unnamed intermediate node with text value
+       - {weather.max - weather.min} = 25
+  **/
+
+  const cell1: Cell = makeCell({
+    graph,
+    value: { min: 50, max: 75 },
+    name: "weather",
+  });
+  const cell2: Cell = makeCell({
+    graph,
+    value: "intermediate",
+    relationships: {
+      [embark.relationships.parent]: cell1,
+    },
+  });
+  const cell3: Cell = makeCell({
+    graph,
+    formula: (cell, get) => {
+      const weather = get(embark.lookups.relativeRef(cell, "weather"));
+      return weather.max - weather.min;
+    },
+    relationships: {
+      [embark.relationships.parent]: cell2,
+    },
+  });
+
+  evalGraph(graph);
+  assertEq(cell3.value, 25);
 ```
 
 More examples in `test/`
