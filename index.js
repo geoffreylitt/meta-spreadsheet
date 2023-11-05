@@ -15,7 +15,7 @@ const makeGraph = (semanticsMap) => {
     };
 };
 let id = 0;
-const makeCell = (graph, value, relationships) => {
+const makeCell = ({ graph, value, relationships, }) => {
     let cell;
     if (value instanceof Function) {
         cell = {
@@ -37,7 +37,7 @@ const compute = (cell) => {
     }
     else {
         // todo actually compute cell value
-        cell.value = "fake result";
+        cell.value = cell.formula(cell);
     }
 };
 const excelLeft = Symbol("left");
@@ -53,8 +53,12 @@ const excel = {
     },
     lookups: {
         relative: (cell, name) => {
-            if (name.left === 1) {
-                return cell.relationships[excelLeft];
+            if (name[excelLeft] === 1) {
+                const target = cell.relationships[excelLeft];
+                if (target === undefined) {
+                    throw new Error(`Expected cell ${cell.id} to have a cell to its left`);
+                }
+                return target.value;
             }
             else {
                 throw new Error("only handle a trivial case so far");
@@ -68,8 +72,19 @@ const evalGraph = (graph) => {
     }
 };
 const graph = makeGraph({ excel });
-const cell1 = makeCell(graph, 1);
-const cell2 = makeCell(graph, (cell) => excel.lookups.relative(cell, { left: 1 }));
+const cell1 = makeCell({ graph, value: 1 });
+const cell2 = makeCell({
+    graph,
+    value: (cell) => {
+        const leftValue = excel.lookups.relative(cell, {
+            [excel.relationships.left]: 1,
+        });
+        return leftValue + 1;
+    },
+    relationships: {
+        [excel.relationships.left]: cell1,
+    },
+});
 evalGraph(graph);
-assertEq(cell2.value, "fake result");
+assertEq(cell2.value, 2);
 console.log("all tests passed!");

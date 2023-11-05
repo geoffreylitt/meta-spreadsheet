@@ -10,9 +10,12 @@ function assertEq(arg0: any, arg1: any) {
   }
 }
 
+// todo: constrain this more? how dynamic are our value types
+type Value = any;
+
 interface Semantics {
   relationships: { [key: string]: symbol };
-  lookups: { [key: string]: (cell: Cell, name: any) => Cell | undefined };
+  lookups: { [key: string]: (cell: Cell, name: any) => Value };
 }
 
 interface Graph {
@@ -22,7 +25,7 @@ interface Graph {
 type Formula = (cell: Cell) => any;
 interface Cell {
   id: number;
-  value: any;
+  value: Value;
   formula?: Formula;
   relationships: { [key: symbol]: Cell };
 }
@@ -35,11 +38,15 @@ const makeGraph = (semanticsMap: { [key: string]: Semantics }): Graph => {
 
 let id = 0;
 
-const makeCell = (
-  graph: Graph,
-  value: any,
-  relationships?: { [key: string]: Cell }
-): Cell => {
+const makeCell = ({
+  graph,
+  value,
+  relationships,
+}: {
+  graph: Graph;
+  value: any;
+  relationships?: { [key: string]: Cell };
+}): Cell => {
   let cell;
   if (value instanceof Function) {
     cell = {
@@ -61,7 +68,7 @@ const compute = (cell: Cell): any => {
     return cell.value;
   } else {
     // todo actually compute cell value
-    cell.value = "fake result";
+    cell.value = cell.formula(cell);
   }
 };
 
@@ -78,8 +85,14 @@ const excel: Semantics = {
   },
   lookups: {
     relative: (cell, name) => {
-      if (name.left === 1) {
-        return cell.relationships[excelLeft];
+      if (name[excelLeft] === 1) {
+        const target = cell.relationships[excelLeft];
+        if (target === undefined) {
+          throw new Error(
+            `Expected cell ${cell.id} to have a cell to its left`
+          );
+        }
+        return target.value;
       } else {
         throw new Error("only handle a trivial case so far");
       }
@@ -95,13 +108,22 @@ const evalGraph = (graph: Graph): void => {
 
 const graph = makeGraph({ excel });
 
-const cell1: Cell = makeCell(graph, 1);
-const cell2: Cell = makeCell(graph, (cell: Cell) =>
-  excel.lookups.relative(cell, { left: 1 })
-);
+const cell1: Cell = makeCell({ graph, value: 1 });
+const cell2: Cell = makeCell({
+  graph,
+  value: (cell: Cell) => {
+    const leftValue = excel.lookups.relative(cell, {
+      [excel.relationships.left]: 1,
+    });
+    return leftValue + 1;
+  },
+  relationships: {
+    [excel.relationships.left]: cell1,
+  },
+});
 
 evalGraph(graph);
 
-assertEq(cell2.value, "fake result");
+assertEq(cell2.value, 2);
 
 console.log("all tests passed!");
