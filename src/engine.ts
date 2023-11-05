@@ -1,9 +1,14 @@
-// todo: constrain this more? how dynamic are our value types
+// todo: we may want to constrain value types in the system more than "any js value"
 export type Value = any;
 
 export interface CoordinateSystem {
   relationships: { [key: string]: symbol };
-  lookups: { [key: string]: (cell: Cell, name: any) => Value };
+
+  // TODO: do lookups always take a string as the name?
+  // that's convenient for a textual language, but puts parsing burden
+  // inside the lookup functions; we could also parse outside and
+  // give the lookup a more structured thing to deal with.
+  lookups: { [key: string]: (cell: Cell, name: string) => Value };
 }
 
 export interface Graph {
@@ -11,10 +16,15 @@ export interface Graph {
 }
 
 export type Formula = (cell: Cell) => any;
+
 export interface Cell {
   id: number;
   value: Value;
   formula?: Formula;
+
+  // we dump all the relationships from all coordinate systems into one object,
+  // using unique symbols to keep them uniquely distinct across coordinate systems.
+  // (maybe just namespacing them would be good enough)
   relationships: { [key: symbol]: Cell };
 }
 
