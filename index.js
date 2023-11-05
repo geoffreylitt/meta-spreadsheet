@@ -1,90 +1,32 @@
 "use strict";
-function assert(arg0) {
-    if (!arg0) {
-        throw new Error("test failed!");
-    }
-}
-function assertEq(arg0, arg1) {
-    if (arg0 !== arg1) {
-        throw new Error(`expected ${arg0} to equal ${arg1}`);
-    }
-}
-const makeGraph = (semanticsMap) => {
-    return {
-        cells: {},
-    };
-};
-let id = 0;
-const makeCell = ({ graph, value, relationships, }) => {
-    let cell;
-    if (value instanceof Function) {
-        cell = {
-            id: ++id,
-            value: undefined,
-            formula: value,
-            relationships: relationships ?? {},
-        };
-    }
-    else {
-        cell = { id: ++id, value, relationships: relationships ?? {} };
-    }
-    graph.cells[id] = cell;
-    return cell;
-};
-const compute = (cell) => {
-    if (cell.formula === undefined) {
-        return cell.value;
-    }
-    else {
-        // todo actually compute cell value
-        cell.value = cell.formula(cell);
-    }
-};
-const excelLeft = Symbol("left");
-const excelRight = Symbol("right");
-const excelDown = Symbol("down");
-const excelUp = Symbol("up");
-const excel = {
-    relationships: {
-        left: excelLeft,
-        right: excelRight,
-        down: excelDown,
-        up: excelUp,
-    },
-    lookups: {
-        relative: (cell, name) => {
-            if (name[excelLeft] === 1) {
-                const target = cell.relationships[excelLeft];
-                if (target === undefined) {
-                    throw new Error(`Expected cell ${cell.id} to have a cell to its left`);
-                }
-                return target.value;
-            }
-            else {
-                throw new Error("only handle a trivial case so far");
-            }
-        },
-    },
-};
-const evalGraph = (graph) => {
-    for (const [id, cell] of Object.entries(graph.cells)) {
-        compute(cell);
-    }
-};
-const graph = makeGraph({ excel });
-const cell1 = makeCell({ graph, value: 1 });
-const cell2 = makeCell({
+Object.defineProperty(exports, "__esModule", { value: true });
+const engine_1 = require("./engine");
+const excel_1 = require("./excel");
+const tinyTestFramework_1 = require("./tinyTestFramework");
+const graph = (0, engine_1.makeGraph)({ excel: excel_1.excel });
+const cell1 = (0, engine_1.makeCell)({ graph, value: 1 });
+const cell2 = (0, engine_1.makeCell)({
     graph,
     value: (cell) => {
-        const leftValue = excel.lookups.relative(cell, {
-            [excel.relationships.left]: 1,
-        });
-        return leftValue + 1;
+        return (excel_1.excel.lookups.relative(cell, {
+            [excel_1.excel.relationships.left]: 1,
+        }) + 1);
     },
     relationships: {
-        [excel.relationships.left]: cell1,
+        [excel_1.excel.relationships.left]: cell1,
     },
 });
-evalGraph(graph);
-assertEq(cell2.value, 2);
+const cell3 = (0, engine_1.makeCell)({
+    graph,
+    value: (cell) => {
+        return (excel_1.excel.lookups.relative(cell, {
+            [excel_1.excel.relationships.left]: 1,
+        }) + 1);
+    },
+    relationships: {
+        [excel_1.excel.relationships.left]: cell2,
+    },
+});
+(0, engine_1.evalGraph)(graph);
+(0, tinyTestFramework_1.assertEq)(cell2.value, 2);
 console.log("all tests passed!");
