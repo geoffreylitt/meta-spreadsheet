@@ -22,6 +22,10 @@ export interface Cell {
   value: Value;
   formula?: Formula;
 
+  // A local identifier for this cell (not globally unique.)
+  // TODO: is this actually a universal primitive, or is it specific to Embark?
+  name?: string;
+
   // we dump all the relationships from all coordinate systems into one object,
   // using unique symbols to keep them uniquely distinct across coordinate systems.
   // (maybe just namespacing them would be good enough)
@@ -44,10 +48,12 @@ export const makeCell = ({
   graph,
   value,
   relationships,
+  name,
 }: {
   graph: Graph;
   value: any;
   relationships?: { [key: string]: Cell };
+  name?: string;
 }): Cell => {
   let cell;
   if (value instanceof Function) {
@@ -56,9 +62,10 @@ export const makeCell = ({
       value: undefined,
       formula: value,
       relationships: relationships ?? {},
+      name,
     };
   } else {
-    cell = { id: ++id, value, relationships: relationships ?? {} };
+    cell = { id: ++id, value, relationships: relationships ?? {}, name };
   }
 
   graph.cells[id] = cell;

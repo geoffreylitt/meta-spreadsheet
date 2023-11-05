@@ -1,4 +1,4 @@
-import { CoordinateSystem } from "./engine";
+import { Cell, CoordinateSystem } from "./engine";
 
 const excelLeft = Symbol("left");
 const excelRight = Symbol("right");
@@ -10,10 +10,10 @@ const relationships = {
   down: excelDown,
   up: excelUp,
 };
-export const excel: CoordinateSystem = {
+export const excel = {
   relationships,
   lookups: {
-    relative: (cell, name: string) => {
+    relative: (cell: Cell, name: string) => {
       const ops = name.split(",");
       // todo: use a proper parser here
 

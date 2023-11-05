@@ -1,13 +1,13 @@
-import { CoordinateSystem } from "./engine";
+import { Cell, CoordinateSystem } from "./engine";
 
-export const embark: CoordinateSystem = {
+export const embark = {
   relationships: {
     parent: Symbol("parent"),
     child: Symbol("child"),
   },
   lookups: {
-    relativeRef: (cell, name: string) => {
-      throw new Error("haven't implemented Embark lookup yet");
+    relativeRef: (cell: Cell, name: string): any => {
+      return "hey";
     },
   },
 };
