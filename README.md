@@ -26,7 +26,7 @@ Currently this demo shows two coordinate systems:
     - up
     - down
   - lookups:
-    - relative cell position: eg, "L2U2"
+    - relative cell position: eg, "left 2, up 1"
 - **embark:**
   - relationships: parent/child
   - lookups:
@@ -40,4 +40,10 @@ Currently this demo shows two coordinate systems:
 ## future work
 
 - Adapton-style minimal lazy spreadsheet evaluation
-- more coordinate systems?
+- add a UI
+- play with more coordinate systems
+
+## questions
+
+- is L2U1 equivalent to U1L2? how does that work with a sparse link-based coordinate system where we don't necessarily materialize a cell at every position?
+  - we could use a pathfinding algorithm, but that feels kinda needlessly heavy...
