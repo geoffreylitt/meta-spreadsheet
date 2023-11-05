@@ -1,10 +1,10 @@
-import { Semantics } from "./engine";
+import { CoordinateSystem } from "./engine";
 
 const excelLeft = Symbol("left");
 const excelRight = Symbol("right");
 const excelDown = Symbol("down");
 const excelUp = Symbol("up");
-export const excel: Semantics = {
+export const excel: CoordinateSystem = {
   relationships: {
     left: excelLeft,
     right: excelRight,
@@ -13,7 +13,7 @@ export const excel: Semantics = {
   },
   lookups: {
     relative: (cell, name) => {
-      if (name[excelLeft] === 1) {
+      if (name["L"] === 1) {
         const target = cell.relationships[excelLeft];
         if (target === undefined) {
           throw new Error(

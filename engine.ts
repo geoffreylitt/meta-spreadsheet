@@ -1,7 +1,7 @@
 // todo: constrain this more? how dynamic are our value types
 export type Value = any;
 
-export interface Semantics {
+export interface CoordinateSystem {
   relationships: { [key: string]: symbol };
   lookups: { [key: string]: (cell: Cell, name: any) => Value };
 }
@@ -18,8 +18,9 @@ export interface Cell {
   relationships: { [key: symbol]: Cell };
 }
 
+// create a new computation graph
 export const makeGraph = (semanticsMap: {
-  [key: string]: Semantics;
+  [key: string]: CoordinateSystem;
 }): Graph => {
   return {
     cells: {},
@@ -28,6 +29,7 @@ export const makeGraph = (semanticsMap: {
 
 let id = 0;
 
+// create a new cell in the computation graph
 export const makeCell = ({
   graph,
   value,
@@ -53,15 +55,18 @@ export const makeCell = ({
   return cell;
 };
 
+export const getCell = (graph: Graph, id: string) => graph.cells[id];
+
+// compute the value of a single cell
 export const compute = (cell: Cell): any => {
   if (cell.formula === undefined) {
     return cell.value;
   } else {
-    // todo actually compute cell value
     cell.value = cell.formula(cell);
   }
 };
 
+// eagerly compute values for all cells in the sheet
 export const evalGraph = (graph: Graph): void => {
   for (const [id, cell] of Object.entries(graph.cells)) {
     compute(cell);
