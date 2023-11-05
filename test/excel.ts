@@ -16,17 +16,15 @@ export const testExcel = () => {
   const cell1: Cell = makeCell({ graph, value: 1 });
   const cell2: Cell = makeCell({
     graph,
-    value: (cell: Cell) => {
-      return excel.lookups.relative(cell, "left 1") + 1;
-    },
+    formula: (cell, get) => get(excel.lookups.relative(cell, "left 1")) + 1,
     relationships: {
       [excel.relationships.left]: cell1,
     },
   });
   const cell3: Cell = makeCell({
     graph,
-    value: (cell: Cell) => {
-      return excel.lookups.relative(cell, "left 1") + 1;
+    formula: (cell, get) => {
+      return get(excel.lookups.relative(cell, "left 1")) + 1;
     },
     relationships: {
       [excel.relationships.left]: cell2,
@@ -67,8 +65,8 @@ export const testExcel = () => {
 
   const cell5: Cell = makeCell({
     graph,
-    value: (cell: Cell) => {
-      return excel.lookups.relative(cell, "left 3,up 1") + 2;
+    formula: (cell, get) => {
+      return get(excel.lookups.relative(cell, "left 3,up 1")) + 2;
     },
     relationships: {
       [excel.relationships.left]: cell3,

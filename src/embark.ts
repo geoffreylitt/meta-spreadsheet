@@ -20,7 +20,7 @@ export const embark = {
       while (current !== undefined) {
         const child = current.relationships[embarkChild];
         if (child && child.name === name) {
-          return child.value;
+          return child;
         }
 
         const parent = current.relationships[embarkParent];
@@ -28,7 +28,7 @@ export const embark = {
           throw new Error("cycle detected!");
         }
         if (parent.name === name) {
-          return parent.value;
+          return parent;
         }
         current = parent;
       }

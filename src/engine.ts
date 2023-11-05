@@ -15,7 +15,7 @@ export interface Graph {
   cells: { [key: string]: Cell };
 }
 
-export type Formula = (cell: Cell) => any;
+export type Formula = (cell: Cell, get: (cell: Cell) => Value) => any;
 
 export interface Cell {
   id: number;
@@ -46,26 +46,30 @@ let id = 0;
 // create a new cell in the computation graph
 export const makeCell = ({
   graph,
+  formula,
   value,
   relationships,
   name,
 }: {
   graph: Graph;
-  value: any;
+  formula?: Formula;
+  value?: Value;
   relationships?: { [key: string]: Cell };
   name?: string;
 }): Cell => {
   let cell;
-  if (value instanceof Function) {
+  if (formula) {
     cell = {
       id: ++id,
       value: undefined,
-      formula: value,
+      formula,
       relationships: relationships ?? {},
       name,
     };
-  } else {
+  } else if (value) {
     cell = { id: ++id, value, relationships: relationships ?? {}, name };
+  } else {
+    throw new Error("need formula or value for a new cell");
   }
 
   graph.cells[id] = cell;
@@ -74,12 +78,21 @@ export const makeCell = ({
 
 export const getCell = (graph: Graph, id: string) => graph.cells[id];
 
-// compute the value of a single cell
+// compute the value of a single cell.
+// it recurses on all other cells referenced in formulas.
+// we never cache anything, this is super super dumb.
+// TODO: add caching for minimal executions on updates of the graph
 export const compute = (cell: Cell): any => {
   if (cell.formula === undefined) {
     return cell.value;
   } else {
-    cell.value = cell.formula(cell);
+    cell.value = cell.formula(cell, (cell: Cell) => {
+      if (cell === undefined) {
+        throw new Error("can't get value of undefined cell");
+      }
+      return compute(cell);
+    });
+    return cell.value;
   }
 };
 

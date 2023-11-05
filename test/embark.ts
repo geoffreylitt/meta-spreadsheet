@@ -25,8 +25,8 @@ export const testEmbark = () => {
   });
   const cell3: Cell = makeCell({
     graph,
-    value: (cell: Cell) => {
-      const weather = embark.lookups.relativeRef(cell, "weather");
+    formula: (cell, get) => {
+      const weather = get(embark.lookups.relativeRef(cell, "weather"));
       return weather.max - weather.min;
     },
     relationships: {

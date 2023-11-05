@@ -37,9 +37,11 @@ Currently this demo shows two coordinate systems:
 - multiple coordinate systems can be active within a single compute graph; this gestures towards interop.
 - lookup operations can only use the relationships defined within that coordinate system; this keeps coordinate systems cleanly separated
 
+
 ## future work
 
 - Adapton-style minimal lazy spreadsheet evaluation
+  - lookup operations should return cells, not values. this is very important! because that's the only way that spreadsheet dependency tracking can be general across all coordinate systems. the lookup returns a cell, the engine decides how to schedule updates of that cell.
 - add a UI
 - play with more coordinate systems
 

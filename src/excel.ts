@@ -40,7 +40,7 @@ export const excel = {
         }
       }
 
-      return current.value;
+      return current;
     },
   },
 };
