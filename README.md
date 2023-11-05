@@ -4,7 +4,37 @@ A tiny spreadsheet engine with pluggable coordinate systems.
 
 Credit: heavily inspired by ideas from Alex Warth, Avi Bryant, Paul Sonnentag and others.
 
-## play
+## example
+
+```ts
+const graph = makeGraph({ excel });
+
+  /**
+   test case:
+
+   --+------+
+   1 | L1+1 |
+   --+------+
+  **/
+
+  const cell1: Cell = makeCell({ graph, value: 1 });
+  const cell2: Cell = makeCell({
+    graph,
+    formula: (cell, get) => get(excel.lookups.relative(cell, "left 1")) + 1,
+    relationships: {
+      [excel.relationships.left]: cell1,
+    },
+  });
+
+  // Basic math works with L1 relationships
+
+  evalGraph(graph);
+  assertEq(cell2.value, 2);
+```
+
+More examples in `test/`
+
+## run tests / play
 
 ```
 tsc && node dist/index.js
