@@ -1,4 +1,4 @@
-import { embark } from "../src/embark";
+import { embark } from "../src/coordinateSystems/embark";
 import { Cell, evalGraph, makeCell, makeGraph } from "../src/engine";
 import { assertEq } from "./tinyTestFramework";
 

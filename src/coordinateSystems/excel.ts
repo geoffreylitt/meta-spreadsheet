@@ -1,4 +1,4 @@
-import { Cell, CoordinateSystem } from "./engine";
+import { Cell, CoordinateSystem } from "../engine";
 
 const excelLeft = Symbol("left");
 const excelRight = Symbol("right");

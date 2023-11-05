@@ -1,5 +1,5 @@
 import { Cell, evalGraph, makeCell, makeGraph } from "../src/engine";
-import { excel } from "../src/excel";
+import { excel } from "../src/coordinateSystems/excel";
 import { assertEq } from "./tinyTestFramework";
 
 export const testExcel = () => {

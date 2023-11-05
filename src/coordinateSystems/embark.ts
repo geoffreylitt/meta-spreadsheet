@@ -1,4 +1,4 @@
-import { Cell, CoordinateSystem, Value } from "./engine";
+import { Cell, CoordinateSystem, Value } from "../engine";
 
 const embarkParent = Symbol("parent");
 const embarkChild = Symbol("child");
